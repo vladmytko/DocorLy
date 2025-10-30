@@ -9,6 +9,7 @@ import com.example.vladyslav.repository.PatientRepository;
 import com.example.vladyslav.repository.UserRepository;
 import com.example.vladyslav.requests.PatientRegisterRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -28,12 +29,14 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private UserRepository userRepository;
-    private PatientRepository patientRepository;
-    private PasswordEncoder passwordEncoder;
-    private JwtEncoder jwtEncoder;
+    private final UserRepository userRepository;
+    private final PatientRepository patientRepository;
+    private  final PasswordEncoder passwordEncoder;
+    private  final JwtEncoder jwtEncoder;
+    private  final AwsS3Service awsS3Service;
+
+    @org.springframework.beans.factory.annotation.Value("${app.jwt.issuer:medikart-api}")
     private String issuer;
-    private AwsS3Service awsS3Service;
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
@@ -65,8 +68,7 @@ public class AuthService {
                 .build();
 
         var headers = JwsHeader.with(MacAlgorithm.HS256).build();
-        String token = jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
-        return token;
+        return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
     }
 
     @Transactional
@@ -86,7 +88,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(r.getPassword()))
                 .role(Role.PATIENT)
                 .build();
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         // 2) create patient
         Patient p = Patient.builder()
@@ -103,8 +105,9 @@ public class AuthService {
 
         // 3) return dto
         return UserDTO.builder()
-                .email(user.getEmail())
-                .role(user.getRole())
+                .id(savedUser.getId())
+                .email(savedUser.getEmail())
+                .role(savedUser.getRole())
                 .build();
     }
 }

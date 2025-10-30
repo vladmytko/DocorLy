@@ -1,7 +1,6 @@
 package com.example.vladyslav.controller;
 
 import com.example.vladyslav.dto.DoctorDTO;
-import com.example.vladyslav.model.Doctor;
 import com.example.vladyslav.requests.DoctorRegisterRequest;
 import com.example.vladyslav.service.DoctorService;
 import jakarta.validation.Valid;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +26,7 @@ public class DoctorController {
 
     private final DoctorService doctorService;
 
+
     @GetMapping("/all")
     public ResponseEntity<Page<DoctorDTO>> getAllDoctors(@RequestParam(defaultValue = "0") int page,
                                                          @RequestParam(defaultValue = "20") int size){
@@ -33,13 +34,16 @@ public class DoctorController {
         return ResponseEntity.ok(dto);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
-    public ResponseEntity<Doctor> createDoctor(@Valid @RequestBody DoctorRegisterRequest request){
+//    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(
+            value = "/register",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+            )
+    public ResponseEntity<DoctorDTO> createDoctor(@Valid @ModelAttribute DoctorRegisterRequest request){
         return new ResponseEntity<>(doctorService.createDoctor(request), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/by-id/{id}")
     public ResponseEntity<DoctorDTO> getDoctorById(@PathVariable String id){
         return ResponseEntity.ok(doctorService.getDoctorById(id));
     }
@@ -51,7 +55,7 @@ public class DoctorController {
 //        return ResponseEntity.ok(doctorService.search(clinicId, minRating, pageable));
 //    }
 
-    @GetMapping("/{lastName}")
+    @GetMapping("/last-name/{lastName}")
     public ResponseEntity<Page<DoctorDTO>> getDoctorByLastName(@PathVariable String lastName,
                                                                @RequestParam(defaultValue = "0") int page,
                                                                @RequestParam(defaultValue = "20") int size){

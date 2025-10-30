@@ -1,6 +1,7 @@
 package com.example.vladyslav.service;
 
 import com.example.vladyslav.dto.DoctorDTO;
+import com.example.vladyslav.exception.NotFoundException;
 import com.example.vladyslav.model.Speciality;
 import com.example.vladyslav.repository.SpecialityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,32 @@ public class SpecialityService {
     }
 
     public Speciality createSpeciality(Speciality speciality){
+
+
+        // Validate input
+        if(speciality.getTitle() == null || speciality.getTitle().trim().isBlank()){
+           throw new IllegalArgumentException("Title must be provided");
+        }
+
+        // Normalise title (trim)
+        String normaliseTitle = speciality.getTitle().trim();
+
+        // Prevent duplicates. Use repository lookup;
+        try{
+            specialityRepository.findByTitle(normaliseTitle).ifPresent(
+                    existing -> {
+                        throw new IllegalStateException("Speciality with title '" + normaliseTitle + "' already exists");
+                    }
+            );
+        } catch (org.springframework.dao.IncorrectResultSizeDataAccessException e) {
+            // Repository found more than one - duplicates already exists
+            throw new IllegalStateException("Speciality with title '" + normaliseTitle + "' already exists");
+        }
+
         Speciality newSpeciality = Speciality.builder()
-                .title(speciality.getTitle()).build();
+                .title(normaliseTitle).build();
+
+
 
         return specialityRepository.save(newSpeciality);
     }

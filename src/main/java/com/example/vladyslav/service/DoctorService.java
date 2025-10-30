@@ -43,27 +43,15 @@ public class DoctorService {
     @Autowired
     private AwsS3Service awsS3Service;
 
-    public Doctor createDoctor(DoctorRegisterRequest request) {
+    public DoctorDTO createDoctor(DoctorRegisterRequest request) {
 
         // 1) Resolve Speciality if provided
-        Speciality resolvedSpeciality = null;
-        if (request.getSpeciality() != null) {
-            Speciality incoming = request.getSpeciality();
 
-            // Prefer id if present
-            if (incoming.getId() != null && !incoming.getId().isBlank()) {
-                resolvedSpeciality = specialityRepository.findById(incoming.getId())
-                        .orElseThrow(() -> new IllegalArgumentException(
-                                "Speciality not found for id: " + incoming.getId()));
-            }
-            // Otherwise try by title (create if not exists)
-            else if (incoming.getTitle() != null && !incoming.getTitle().isBlank()) {
-                resolvedSpeciality = specialityRepository.findByTitle(incoming.getTitle())
-                        .orElseGet(() -> specialityRepository.save(
-                                Speciality.builder().title(incoming.getTitle()).build()
-                        ));
-            }
-        }
+
+        if (request.getSpecialityTitle() != null && !request.getSpecialityTitle().isBlank()) {
+                Speciality speciality = specialityRepository.findByTitle(request.getSpecialityTitle())
+                        .orElseThrow(()-> new NotFoundException("Speciality not found with title " + request.getSpecialityTitle()));}
+
 
         // 2) Normalise and validate languages
         List<LanguageCode> validLanguages = new ArrayList<>();
@@ -100,13 +88,14 @@ public class DoctorService {
         // 3) Upload image to S3 and generate URL
         String imageUrl = awsS3Service.saveImageToS3(request.getImage());
 
+        Speciality speciality = specialityRepository.findByTitle(request.getSpecialityTitle()).orElseThrow(() -> new NotFoundException("Speciality not found by title " + request.getSpecialityTitle()));
 
         // 4) Attach resolved speciality & user, then save doctor
         Doctor doctor = Doctor.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
-                .speciality(resolvedSpeciality)
+                .speciality(speciality)
                 .phoneNumber(request.getPhoneNumber())
                 .dateOfBirth(request.getDateOfBirth())
                 .bio(request.getBio())
@@ -117,13 +106,9 @@ public class DoctorService {
                 .languages(validLanguages)
                 .build();
 
+        doctorRepository.save(doctor);
 
-
-        if (resolvedSpeciality != null) {
-            doctor.setSpeciality(resolvedSpeciality);
-        }
-
-        return doctorRepository.save(doctor);
+        return toDTO(doctor);
     }
 
     public DoctorDTO getDoctorById(String doctorId){
@@ -177,7 +162,7 @@ public class DoctorService {
                 .bio(doctor.getBio())
                 .reviews(doctor.getReviews())
                 .averageRating(doctor.getAverageRating())
-                .photoUrl(doctor.getImageUrl())
+                .imageUrl(doctor.getImageUrl())
                 .createdAt(doctor.getCreatedAt())
                 .updatedAt(doctor.getUpdatedAt())
                 .consultationFee(doctor.getConsultationFee())

@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -42,4 +43,12 @@ public class AvailabilityRule {
     private int slotMinutes;            // e.g 30
     private int bufferBeforeMinutes;    // optional
     private int bufferAfterMinutes;     // optional
+
+    List<Window> breaks;
 }
+
+class Window {
+    private LocalTime startBreak;
+    private LocalTime endBreak;
+}
+

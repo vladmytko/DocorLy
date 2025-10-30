@@ -28,7 +28,6 @@ public class DoctorDTO {
     private String bio;
     private Float averageRating;
     private List<Review> reviews;
-    private String photoUrl;
     private List<LanguageCode> languages;
     private Instant createdAt;
     private Instant updatedAt;

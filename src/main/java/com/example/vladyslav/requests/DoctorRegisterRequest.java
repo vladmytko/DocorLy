@@ -31,8 +31,8 @@ public class DoctorRegisterRequest {
     @Size(min = 2, message = "Last name must be at least 2 characters")
     private String lastName;
 
-    @NotBlank(message = "Speciality Object is required")
-    private Speciality speciality;
+    @NotBlank(message = "Speciality title is required")
+    private String specialityTitle;
 
     @NotNull(message = "Date of birth is required")
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -51,7 +51,7 @@ public class DoctorRegisterRequest {
     @NotNull(message = "At least one language is required")
     List<LanguageCode> languages;
 
-    @NotBlank(message = "Consultation price is required")
+    @NotNull(message = "Consultation price is required")
     private int consultationFee;
 
 

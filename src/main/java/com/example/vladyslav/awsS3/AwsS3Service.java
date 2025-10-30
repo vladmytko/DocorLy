@@ -1,13 +1,15 @@
 package com.example.vladyslav.awsS3;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import com.example.vladyslav.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,9 +20,18 @@ import java.util.UUID;
 
 @Service
 public class AwsS3Service {
-    private final String bucketName = "mutko95-hotel-images";
 
-    // Improvement: AWS credentials should be stored in environment variables or a credentials file.
+    @Value("${aws.s3.bucket}")
+    private String bucketName;
+
+    @Value("${aws.s3.region:eu-north-1}")
+    private String region;
+
+    @Value("${aws.s3.access.key:}")
+    private String accessKey;
+
+    @Value("${aws.s3.secret.key:}")
+    private String secretKey;
 
     // Define allowed file extensions for security
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "gif", "bmp", "webp");
@@ -46,17 +57,20 @@ public class AwsS3Service {
             // Secure AWS credentials usage
             AmazonS3 s3Client = createS3Client();
 
-            InputStream inputStream = photo.getInputStream();
+            try(InputStream inputStream = photo.getInputStream()) {
+                ObjectMetadata metadata = new ObjectMetadata();
+                metadata.setContentType(contentType);
+                metadata.setContentLength(photo.getSize());
 
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            metadata.setContentLength(photo.getSize()); // Set file size in metadata for tracking
 
-            // Upload to S3
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3Filename, inputStream, metadata);
-            s3Client.putObject(putObjectRequest);
+                // Upload to S3
+                PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3Filename, inputStream, metadata);
+                s3Client.putObject(putObjectRequest);
+            }
 
-            return "https://" + bucketName + ".s3.amazonaws.com/" + s3Filename;
+            // Use regional virtual-hosted–style URL
+            return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + s3Filename;
+
         } catch (Exception e) {
             throw new NotFoundException("Unable to upload image to S3: " + e.getMessage());
         }
@@ -70,9 +84,14 @@ public class AwsS3Service {
 
     // Secure AWS S3 Client creation
     private AmazonS3 createS3Client() {
-        return AmazonS3ClientBuilder.standard()
-                .withCredentials(new DefaultAWSCredentialsProviderChain())
-                .withRegion(Regions.EU_NORTH_1)
-                .build();
+        AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard().withRegion(region);
+
+        if(accessKey != null && !accessKey.isBlank() && secretKey != null && !secretKey.isBlank()){
+            BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+            builder = builder.withCredentials(new AWSStaticCredentialsProvider(credentials));
+        } else {
+            builder = builder.withCredentials(DefaultAWSCredentialsProviderChain.getInstance());
+        }
+        return builder.build();
     }
 }

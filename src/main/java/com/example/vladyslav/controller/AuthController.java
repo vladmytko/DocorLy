@@ -7,7 +7,9 @@ import com.example.vladyslav.requests.PatientRegisterRequest;
 import com.example.vladyslav.service.AuthService;
 import com.example.vladyslav.service.UserService;
 import com.example.vladyslav.service.JWTService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,12 +45,14 @@ public class AuthController {
                 .build());
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody PatientRegisterRequest req) {
+    @PostMapping(
+            value = "/register",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<UserDTO> register(@Valid @ModelAttribute PatientRegisterRequest req) {
         UserDTO user = auth.register(req);
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.badRequest().build();
-//        var created = auth.register(req);
-//        return ResponseEntity.ok(created);
     }
 
 
