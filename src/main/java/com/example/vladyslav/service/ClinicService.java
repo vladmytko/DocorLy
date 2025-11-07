@@ -134,13 +134,17 @@ public class ClinicService {
     /**
      * Find clinic by doctor id that works there
      * @param doctorId
-     * @return list of matching Clinic DTO objects
+     * @return matching Clinic DTO objects
      */
-    public List<ClinicDTO> findByDoctorId(String doctorId){
-        List<Clinic> clinicList = clinicRepository.findByDoctors_Id(doctorId);
-        return clinicList.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public ClinicDTO findClinicByDoctorId(String doctorId){
+
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(()-> new NotFoundException("Doctor not found with id: " + doctorId));
+
+        Clinic clinic = clinicRepository.findById(doctor.getClinic().getId())
+                .orElseThrow(()-> new NotFoundException("Clinic not found with id: " + doctor.getClinic().getId()));
+
+        return toDTO(clinic);
     }
 
     /**
@@ -149,11 +153,14 @@ public class ClinicService {
      * @param lastName
      * @return list of matching Clinic DTO objects
      */
-    public List<ClinicDTO> findByDoctorFirstNameAndLastName(String firstName, String lastName){
-        List<Clinic> clinicList = clinicRepository.findByDoctorFirstNameAndLastName(firstName,lastName);
-        return clinicList.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public Optional<ClinicDTO> findClinicByDoctorFirstNameLastNameAndEmail(String firstName, String lastName, String email){
+        Doctor doctor = doctorRepository.findByFirstNameAndLastNameAndEmail(firstName,lastName, email)
+                .orElseThrow(()-> new NotFoundException("Doctor not found with"));
+
+        Clinic clinic = clinicRepository.findById(doctor.getClinic().getId())
+                .orElseThrow(()-> new NotFoundException("Clinic not found with id: " + doctor.getClinic().getId()));
+
+        return Optional.ofNullable(toDTO(clinic));
     }
 
 

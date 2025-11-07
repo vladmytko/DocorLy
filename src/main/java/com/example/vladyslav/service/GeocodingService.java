@@ -29,9 +29,9 @@ public class GeocodingService {
             queryBuilder.append("UK");
 
             // Encode the query string to be URL-safe
-            String encodedQuery = URLEncoder.encode(queryBuilder.toString(), StandardCharsets.UTF_8);
+//            String encodedQuery = URLEncoder.encode(queryBuilder.toString(), StandardCharsets.UTF_8);
             // Construct the full URL for the OpenStreetMap Nominatim API request
-            String url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodedQuery;
+            String url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + queryBuilder;
 
             // Use RestTemplate to send a GET request to the API
             RestTemplate restTemplate = new RestTemplate();

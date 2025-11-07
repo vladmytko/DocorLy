@@ -17,10 +17,6 @@ public interface ClinicRepository extends MongoRepository<Clinic, String> {
     Optional<Clinic> findByName(String name);
     List<Clinic> findByNameContainingIgnoreCase(String keyword);
 
-    // Find by doctor
-    List<Clinic> findByDoctors_Id(String doctorId);
-    List<Clinic> findByDoctorFirstNameAndLastName(String firstName, String lastName);
-
     // Geo search
     Page<Clinic> findByLocationNear(Pageable pageable, Point point, Distance distance);
 

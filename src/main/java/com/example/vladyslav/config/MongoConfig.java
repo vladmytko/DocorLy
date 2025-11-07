@@ -38,35 +38,14 @@ public class MongoConfig {
     @Bean
     public ApplicationRunner ensureClinicIndexes(MongoTemplate mongoTemplate){
         return args -> {
-            IndexOperations indexOps = mongoTemplate.indexOps("clinics"); // default collection name for Clinic.class
 
-            // Ensure 2dsphere index on "location" field;
-            GeospatialIndex geoIndex = new GeospatialIndex("location").typed(GeoSpatialIndexType.GEO_2DSPHERE);
-
-            indexOps.createIndex(geoIndex);
-
-            // Ensure text index on selected fields
-            TextIndexDefinition textIndex = new TextIndexDefinition.TextIndexDefinitionBuilder()
-                    .onField("name", 2.0f)  // higher weight for name
-                    .onField("address", 1.0f)
-                    .onField("bio", 1.0f)
-                    .build();
-            indexOps.createIndex(textIndex);
         };
     }
 
     @Bean
     public ApplicationRunner ensureDoctorIndexes(MongoTemplate mongoTemplate){
         return args -> {
-            IndexOperations indexOps = mongoTemplate.indexOps("doctors");
 
-            TextIndexDefinition textIndex = new TextIndexDefinition.TextIndexDefinitionBuilder()
-                    .onField("firstName", 2.0f)
-                    .onField("lastName", 2.0f)
-                    .onField("bio", 1.0f)
-                    .build();
-            indexOps.createIndex(textIndex);
-            indexOps.createIndex(new Index().on("clinic", Sort.Direction.ASC));
         };
     }
 }

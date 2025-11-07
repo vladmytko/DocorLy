@@ -46,14 +46,14 @@ public class ClinicController {
         return new ResponseEntity<>(service.findByNameContainingIgnoreCase(keyword), HttpStatus.FOUND);
     }
 
-    @GetMapping("/by-doctor-id/{doctorId}")
-    public ResponseEntity<List<ClinicDTO>> findByDoctorId(@PathVariable String doctorId){
-        return new ResponseEntity<>(service.findByDoctorId(doctorId), HttpStatus.FOUND);
-    }
+//    @GetMapping("/by-doctor-id/{doctorId}")
+//    public ResponseEntity<List<ClinicDTO>> findByDoctorId(@PathVariable String doctorId){
+//        return new ResponseEntity<>(service.findByDoctorId(doctorId), HttpStatus.FOUND);
+//    }
 
     @GetMapping("/by-doctor-name/{firstName}/{lastName}")
-    public ResponseEntity<List<ClinicDTO>> findByDoctorFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName){
-        return new ResponseEntity<>(service.findByDoctorFirstNameAndLastName(firstName,lastName), HttpStatus.FOUND);
+    public ResponseEntity<Optional<ClinicDTO>> findByDoctorFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName, @RequestParam String email){
+        return new ResponseEntity<>(service.findClinicByDoctorFirstNameLastNameAndEmail(firstName,lastName, email), HttpStatus.FOUND);
     }
 
     @GetMapping("/by-text/{text}")

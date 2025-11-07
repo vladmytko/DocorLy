@@ -1,8 +1,10 @@
 package com.example.vladyslav.service;
 
 import com.example.vladyslav.awsS3.AwsS3Service;
+import com.example.vladyslav.dto.ClinicDTO;
 import com.example.vladyslav.dto.DoctorDTO;
 import com.example.vladyslav.exception.NotFoundException;
+import com.example.vladyslav.model.Clinic;
 import com.example.vladyslav.model.Doctor;
 import com.example.vladyslav.model.Speciality;
 import com.example.vladyslav.model.User;
@@ -165,6 +167,7 @@ public class DoctorService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
+
 
     private DoctorDTO toDTO(Doctor doctor){
         return DoctorDTO.builder()
