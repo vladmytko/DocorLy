@@ -1,13 +1,9 @@
 package com.example.vladyslav.controller;
 
 import com.example.vladyslav.dto.AppointmentDTO;
-import com.example.vladyslav.exception.NotFoundException;
-import com.example.vladyslav.exception.OurException;
 import com.example.vladyslav.model.Appointment;
-import com.example.vladyslav.model.Doctor;
 import com.example.vladyslav.model.User;
 import com.example.vladyslav.model.enums.AppointmentStatus;
-import com.example.vladyslav.model.enums.Role;
 import com.example.vladyslav.repository.DoctorRepository;
 import com.example.vladyslav.requests.RescheduleRequest;
 import com.example.vladyslav.service.AppointmentService;
@@ -21,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 
 

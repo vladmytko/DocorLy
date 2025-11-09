@@ -29,9 +29,7 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final AvailabilityRuleRepository availabilityRuleRepository;
     private final TimeOffRepository timeOffRepository;
-    private final UserRepository userRepository;
     private final DoctorRepository doctorRepository;
-    private final PatientRepository patientRepository;
 
     public AppointmentDTO toDto(Appointment a){
         return AppointmentDTO.builder()

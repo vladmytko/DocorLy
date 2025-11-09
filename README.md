@@ -90,6 +90,31 @@ Together, `AvailabilityRule` and `TimeOff` ensure that patients only see valid, 
 
 ---
 
+### Reviews
+- Patients can leave reviews for doctors and clinics after attended appointments.
+- Each review includes a rating (1–5) and an optional comment.
+- Duplicate reviews from the same patient for the same doctor are prevented.
+- Doctor average ratings are automatically recalculated after each review is added or removed.
+
+---
+
+### Doctor Specialities
+- Administrators can create and manage medical specialities.
+- Each speciality must have a unique, non-empty title.
+- Duplicate speciality titles are automatically prevented.
+- The API supports prefix-based search for specialities, making it easy to find doctors.
+
+---
+
+### Invitations
+- Clinics can invite doctors to join their team using the invitation system.
+- Invitations include the clinic ID, doctor ID, and email, and start with a `PENDING` status.
+- Doctors can view all pending invitations and choose to accept or decline them.
+- When a doctor accepts an invitation, they are automatically added to the clinic.
+- If an invitation is declined or already processed, it can no longer be accepted.
+- Validation ensures doctors cannot receive duplicate invitations for the same clinic.
+
+---
 ### Storage & Infrastructure
 - **MongoDB Atlas** – main database.
 - **AWS S3** – image storage (clinic logos, doctor avatars).
@@ -152,5 +177,5 @@ Appointment
 
 Review
  ├─ id
- ├─ clinicId, patientId
+ ├─ clinicId, patientId, appointmentId
  ├─ rating, comment, createdAt
