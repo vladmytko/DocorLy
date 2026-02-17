@@ -38,12 +38,12 @@ public class ClinicController {
 
     @GetMapping("/by-name/{name}")
     public ResponseEntity<Optional<ClinicDTO>> findClinicByName(@PathVariable String name){
-        return new ResponseEntity<>(service.findClinicByName(name), HttpStatus.FOUND);
+        return new ResponseEntity<>(service.findClinicByName(name), HttpStatus.OK);
     }
 
     @GetMapping("/by-keyword/{keyword}")
     public ResponseEntity<List<ClinicDTO>> findByNameContainingIgnoreCase(@PathVariable String keyword){
-        return new ResponseEntity<>(service.findByNameContainingIgnoreCase(keyword), HttpStatus.FOUND);
+        return new ResponseEntity<>(service.findByNameContainingIgnoreCase(keyword), HttpStatus.OK);
     }
 
 //    @GetMapping("/by-doctor-id/{doctorId}")
@@ -53,32 +53,32 @@ public class ClinicController {
 
     @GetMapping("/by-doctor-name/{firstName}/{lastName}")
     public ResponseEntity<Optional<ClinicDTO>> findByDoctorFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName, @RequestParam String email){
-        return new ResponseEntity<>(service.findClinicByDoctorFirstNameLastNameAndEmail(firstName,lastName, email), HttpStatus.FOUND);
+        return new ResponseEntity<>(service.findClinicByDoctorFirstNameLastNameAndEmail(firstName,lastName, email), HttpStatus.OK);
     }
 
     @GetMapping("/by-text/{text}")
     public ResponseEntity<Page<ClinicDTO>> searchByText(@PathVariable String text,
                                                         @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "20") int size){
-        return new ResponseEntity<>(service.searchByText(page, size, text), HttpStatus.FOUND);
+        return new ResponseEntity<>(service.searchByText(page, size, text), HttpStatus.OK);
     }
 
     @GetMapping("/by-average-rating/{rating}")
     public ResponseEntity<Page<ClinicDTO>> findByAverageRatingGreaterThanEqual(@PathVariable Float rating,
                                                                                @RequestParam(defaultValue = "0") int page,
                                                                                @RequestParam(defaultValue = "20") int size){
-        return new ResponseEntity<>(service.findByAverageRatingGreaterThanEqual(page, size, rating), HttpStatus.FOUND);
+        return new ResponseEntity<>(service.findByAverageRatingGreaterThanEqual(page, size, rating), HttpStatus.OK);
     }
 
     @GetMapping("/by-id/{clinicId}")
     public ResponseEntity<ClinicDTO> getClinicById(@PathVariable String clinicId){
-        return new ResponseEntity<>(service.getClinicById(clinicId), HttpStatus.FOUND);
+        return new ResponseEntity<>(service.getClinicById(clinicId), HttpStatus.OK);
     }
 
     @GetMapping("/all")
     public ResponseEntity<Page<ClinicDTO>> getAllClinics( @RequestParam(defaultValue = "0") int page,
                                                     @RequestParam(defaultValue = "20") int size){
-        return new ResponseEntity<>(service.getAllClinics(page, size), HttpStatus.FOUND);
+        return new ResponseEntity<>(service.getAllClinics(page, size), HttpStatus.OK);
     }
 
     @DeleteMapping("/{clinicId}")
@@ -107,6 +107,6 @@ public class ClinicController {
             @RequestParam(defaultValue = "20") int size
 
     ) {
-        return new ResponseEntity<>(service.findClinicsNear(page, size, lat, lon, radiusKm), HttpStatus.FOUND);
+        return new ResponseEntity<>(service.findClinicsNear(page, size, lat, lon, radiusKm), HttpStatus.OK);
     }
 }
